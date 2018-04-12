@@ -24,6 +24,9 @@ void setPivot(matrix a, int c)
 {
   //c is counter 0 column
   int i=0;
+  int itmp;
+  int ctmp=c;
+  double dtmp;
   double pivot = a.data[0+c];
   cout << pivot << endl;
   while (i<a.size)
@@ -32,9 +35,27 @@ void setPivot(matrix a, int c)
     c--;
     cout << a.data[i] << endl;
     if (pivot < a.data[i])
+    {
       pivot = a.data[i];
+      itmp = i;
+    }
   };
+  for (int j = ctmp; j<a.col; j++)
+  {
+    dtmp = a.data[j];
+    a.data[j] = a.data[itmp+j];
+    a.data[itmp+j] = dtmp;
+  }
   cout << "Pivot: " << pivot << endl;
+  int k=0;
+  do
+  {
+	cout << a.data[k];
+	k++;
+	if (k % a.col == 0)
+	  cout << endl;
+  }  
+  while (k<a.size);  
   return;
 }
 
@@ -105,7 +126,7 @@ void inputFile(int argc, char *argv[])
   }*/
   cout << endl;
   
-  setPivot(matA, 1);
+  setPivot(matA, 0);
   
   mattest.close();
 }
