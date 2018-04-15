@@ -39,17 +39,13 @@ void eliminate(matrix a, int c)
   cout << "Eliminating...\n";
   double f; //pivot factor
   int pivot = c*a.bcol+c;
-  for (int i=1; i<=2; i++)
+  for (int i=1; (i+c)<a.row; i++)
   {
-    f=-a.data[i*a.bcol]/a.data[pivot];
-    a.data[i*a.bcol]=0;
-    cout << "oc: " << a.data[i*a.bcol] << endl;
-    cout << "Factor: " << f << endl;
-    for (int j=1; j<a.bcol ;j++)
+    f=-a.data[(c+i)*a.bcol+c]/a.data[pivot];
+    a.data[(i+c)*a.bcol+c]=0;
+    for (int j=1+c; j<a.bcol ;j++)
     {
-      cout << "Changing " << a.data[i*a.bcol+j] << endl;
-      cout << "Above: " << a.data[j] << endl << endl;
-      a.data[i*a.bcol+j]+=f*a.data[j];
+      a.data[(c+i)*a.bcol+j]+=f*a.data[j+c*a.bcol];
     }
     displayMat(a);
     cout << endl;
@@ -68,8 +64,6 @@ void setPivot(matrix a, int c)
   cout << "Pivoting: " << pivot << endl;
   for(int i=dpivot, j=c; j<a.row; i+=a.bcol, j++)
   {
-    cout << "Iteration " << j << endl;
-    cout << a.data[i] << endl;
     if (pivot < a.data[i])
     {
       pivot = a.data[i];
@@ -146,7 +140,7 @@ int main(int argc, char *argv[])
   matrix matA = inputFile(argc, argv);
   for (int i=0; i<matA.row; i++)
   {
-    cout << "ITERATION " << i << endl;
+    cout << "MAIN ITERATION " << i << endl;
     setPivot(matA,i);
     eliminate(matA,i);
   }
