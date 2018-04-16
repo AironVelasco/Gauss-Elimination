@@ -17,11 +17,11 @@ matrix::matrix(int a, int b)
 {
   row = a;
   col = b;
-  bcol = b+1;
-  size = row*bcol;
+  bcol = b+1; //includes right-side
+  size = row*bcol; //includes right-side
   data = new double[size];
-  var = new double[row];
-  for(int i=0; i<row; i++)
+  var = new double[row]; //solution array
+  for(int i=0; i<row; i++) //initialized to zero, explained why in solve()
     var[i]=0;
 }
 
@@ -32,31 +32,33 @@ void displayMat(matrix a)
   {
 	cout << a.data[k] << " ";
 	k++;
-	if (k % a.bcol == 0)
+	if (k % a.bcol == 0) //new line when k is bcol
 	  cout << endl;
   }  
-  while (k<a.size);      
+  while (k<a.size);
+  cout << endl;
 }
 
 void output(matrix a)
 {
   for(int i=0; i<a.row; i++)
-  {
     cout << "x" << i << " = " << a.var[i] << endl;
-  }
   return;
 }
 
 void solve(matrix a)
 {
-  double d;
-  double t[a.row];
-  for (int i=0;i<a.row;i++)
-    t[i] = 0;
+  cout << "Solving...\n";
+  double d; //denominator
+  double t[a.row]; //numerator terms
   for(int i=1; i<=a.row; i++)
   {
     t[0] = -a.data[(a.size-1)-((i-1)*a.bcol)];
     d = a.data[(a.size-1)-((i-1)*a.bcol)-i];
+    /*var was initialized to zero so that
+    it's null when it's not needed in the terms*/
+    /*var will be given a value for the
+    next iterations where it's needed*/
     for(int j=1; j<a.row; j++)
       t[j] = a.var[a.row-j]*a.data[(a.size-1)-((i-1)*a.bcol)-j];
     for(int j=0; j<a.row; j++)
@@ -69,17 +71,13 @@ void eliminate(matrix a, int c)
 {
   cout << "Eliminating...\n";
   double f; //pivot factor
-  int pivot = c*a.bcol+c;
+  int pivot = c*a.bcol+c; //pivot's array address
   for (int i=1; (i+c)<a.row; i++)
   {
     f=-a.data[(c+i)*a.bcol+c]/a.data[pivot];
-    a.data[(i+c)*a.bcol+c]=0;
+    a.data[(i+c)*a.bcol+c]=0; //sets column pivot terms to zero
     for (int j=1+c; j<a.bcol ;j++)
-    {
-      a.data[(c+i)*a.bcol+j]+=f*a.data[j+c*a.bcol];
-    }
-    displayMat(a);
-    cout << endl;
+      a.data[(c+i)*a.bcol+j]+=f*a.data[j+c*a.bcol]; //adjusts each term accordingly
   }
   displayMat(a);
   return;
@@ -87,34 +85,31 @@ void eliminate(matrix a, int c)
 
 void setPivot(matrix a, int c)
 {
-  //c is counter 0 column
-  double dtmp;
-  int dpivot = c*a.bcol+c;
-  int itmp = dpivot;
-  double pivot = a.data[dpivot];
-  cout << "Pivoting: " << pivot << endl;
+  cout << "Pivoting...\n";
+  double dtmp; //data temp, stores data or terms
+  int dpivot = c*a.bcol+c; //stores pivot's array address
+  int itmp = dpivot; //stores it again for comparison later
+  double pivot = a.data[dpivot]; //pivot
+  //searches for highest number by comparing to pivot
   for(int i=dpivot, j=c; j<a.row; i+=a.bcol, j++)
-  {
     if (pivot < a.data[i])
     {
-      pivot = a.data[i];
-      itmp = i;
+      pivot = a.data[i]; //sets new pivot
+      itmp = i; //stores new pivot's array address
     }
-  }
-  int k;
+  //compares old and new addresses
   if (dpivot == itmp)
   {
-    cout << "No Pivot Needed\n";
+    cout << "No Pivot Needed\n\n";
     return;
   }
   else
   {
     for (int j=0, k = dpivot; j<a.bcol; j++, k++)
     {
-      dtmp = a.data[k]; //storing next row
-      a.data[k] = a.data[itmp+j]; //equate next row to pivot row
-      a.data[itmp+j] = dtmp; //equate pivot row to next row
-      cout << endl;
+      dtmp = a.data[k]; //storing old pivot row
+      a.data[k] = a.data[itmp+j]; //equate old pivot row to new pivot row
+      a.data[itmp+j] = dtmp; //equate new pivot row to old pivot row
     }
   }
   displayMat(a);
@@ -124,7 +119,7 @@ void setPivot(matrix a, int c)
 
 matrix inputFile(int argc, char *argv[])
 {
-  ifstream mattest;
+  ifstream mattest; //matrix test
   string filename;
   int irow, icol;
   
@@ -135,9 +130,7 @@ matrix inputFile(int argc, char *argv[])
     mattest.open(filename.c_str());
   }
   else
-  {
     mattest.open(argv[1]);
-  }
 
   while (!mattest)
   {
@@ -150,16 +143,10 @@ matrix inputFile(int argc, char *argv[])
   mattest >> icol;
   
   matrix matA(irow,icol);
-
-  cout << "size: " << matA.size << endl;
   
   for (int i=0;i<matA.size;i++)
-  {
 	mattest >> matA.data[i];
-  }
-  int i = 0;
   displayMat(matA);
-  cout << endl;
   
   mattest.close();
   return matA;
@@ -169,9 +156,8 @@ int main(int argc, char *argv[])
 {
   //Opens input file and stores the matrix
   matrix matA = inputFile(argc, argv);
-  for (int i=0; i<matA.row; i++)
+  for (int i=0; i<matA.row-1; i++)
   {
-    cout << "MAIN ITERATION " << i << endl;
     setPivot(matA,i);
     eliminate(matA,i);
   }
