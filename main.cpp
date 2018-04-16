@@ -88,15 +88,28 @@ void setPivot(matrix a, int c)
   cout << "Pivoting...\n";
   double dtmp; //data temp, stores data or terms
   int dpivot = c*a.bcol+c; //stores pivot's array address
+  int spivot = 0; //safety pivot for when original pivot is zero
   int itmp = dpivot; //stores it again for comparison later
   double pivot = a.data[dpivot]; //pivot
   //searches for highest number by comparing to pivot
   for(int i=dpivot, j=c; j<a.row; i+=a.bcol, j++)
+  {
+    if (a.data[i] != 0) //stores nonzero pivot column
+    {
+      spivot = a.data[i];
+      dtmp = i;
+    }
     if (pivot < a.data[i])
     {
       pivot = a.data[i]; //sets new pivot
       itmp = i; //stores new pivot's array address
     }
+  }
+  if (pivot == 0) //sets pivot to nonzero if it's zero originally
+  {
+    pivot = spivot;
+    itmp = dtmp;
+  }
   //compares old and new addresses
   if (dpivot == itmp)
   {
