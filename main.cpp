@@ -9,6 +9,7 @@ class matrix
   public:
     int row, col, size, bcol;
     double *data;
+    double *var;
     matrix(int, int);
 };
 
@@ -19,6 +20,9 @@ matrix::matrix(int a, int b)
   bcol = b+1;
   size = row*bcol;
   data = new double[size];
+  var = new double[row];
+  for(int i=0; i<row; i++)
+    var[i]=0;
 }
 
 void displayMat(matrix a)
@@ -32,6 +36,33 @@ void displayMat(matrix a)
 	  cout << endl;
   }  
   while (k<a.size);      
+}
+
+void output(matrix a)
+{
+  for(int i=0; i<a.row; i++)
+  {
+    cout << "x" << i << " = " << a.var[i] << endl;
+  }
+  return;
+}
+
+void solve(matrix a)
+{
+  double d;
+  double t[a.row];
+  for (int i=0;i<a.row;i++)
+    t[i] = 0;
+  for(int i=1; i<=a.row; i++)
+  {
+    t[0] = -a.data[(a.size-1)-((i-1)*a.bcol)];
+    d = a.data[(a.size-1)-((i-1)*a.bcol)-i];
+    for(int j=1; j<a.row; j++)
+      t[j] = a.var[a.row-j]*a.data[(a.size-1)-((i-1)*a.bcol)-j];
+    for(int j=0; j<a.row; j++)
+      a.var[a.row-i] -= t[j];
+    a.var[a.row-i] /= d;
+  }
 }
 
 void eliminate(matrix a, int c)
@@ -144,6 +175,8 @@ int main(int argc, char *argv[])
     setPivot(matA,i);
     eliminate(matA,i);
   }
+  solve(matA);
+  output(matA);
   system("PAUSE");
   return EXIT_SUCCESS;
 }
