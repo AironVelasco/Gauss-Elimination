@@ -16,15 +16,9 @@ void displayMat()
 	cout << data[k] << " ";
 	k++;
 	if (k % bcol == 0) //new line when k is bcol
-	{
 	  cout << endl;
-    }
   }  
-  while (k<size);/*
-  for(int i=0; i<size; i++)
-  {
-    cout << data[i] << " ";
-  }*/
+  while (k<size);
   cout << endl;
 }
 
@@ -108,14 +102,12 @@ void setPivot(int c)
     return;
   }
   else
-  {
     for (int j=0, k = dpivot; k<bcol; j++, k++)
     {
       dtmp = data[k]; //storing old pivot row
       data[k] = data[itmp+j]; //equate old pivot row to new pivot row
       data[itmp+j] = dtmp; //equate new pivot row to old pivot row
     }
-  }
   cout << "Test\n";
   displayMat();
   return;
