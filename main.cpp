@@ -7,19 +7,23 @@ using namespace std;
 double *data;
 double *var;
 int row, col, size;
+int choice=0;
 
 void displayMat()
 {
-  int k = 0;
-  do
+  if (choice == 0)
   {
-	cout << data[k] << " ";
-	k++;
-	if (k % col == 0) //new line when k is col
-	  cout << endl;
+    int k = 0;
+    do
+    {
+    cout << data[k] << " ";
+    k++;
+    if (k % col == 0) //new line when k is col
+      cout << endl;
+    }
+    while (k<size);
+    cout << endl;
   }
-  while (k<size);
-  cout << endl;
 }
 
 void output()
@@ -52,7 +56,8 @@ void solve()
 
 void eliminate(int c)
 {
-  cout << "Eliminating...\n";
+  if (choice == 0)
+    cout << "Eliminating...\n";
   double f; //pivot factor
   int pivot = c*col+c; //pivot's array address
   for (int i=1; (i+c)<row; i++)
@@ -68,7 +73,8 @@ void eliminate(int c)
 
 void setPivot(int c)
 {
-  cout << "Pivoting...\n";
+  if (choice == 0)
+    cout << "Pivoting...\n";
   double dtmp; //data temp, stores data or terms
   int dpivot = c*col+c; //stores pivot's array address
   int spivot; //safety pivot for when original pivot is zero
@@ -88,17 +94,16 @@ void setPivot(int c)
       itmp = i; //stores new pivot's array address
     }
   }
-  cout << "Test\n";
   if (pivot == 0) //sets pivot to nonzero if it's zero originally
   {
     pivot = spivot;
     itmp = dtmp;
   }
-  cout << "Test\n";
   //compares old and new addresses
   if (dpivot == itmp)
   {
-    cout << "No Pivot Needed\n\n";
+    if (choice == 0)
+      cout << "No Pivot Needed\n\n";
     return;
   }
   else
@@ -108,7 +113,6 @@ void setPivot(int c)
       data[k] = data[itmp+j]; //equate old pivot row to new pivot row
       data[itmp+j] = dtmp; //equate new pivot row to old pivot row
     }
-  cout << "Test\n";
   displayMat();
   return;
 }
@@ -144,6 +148,7 @@ void inputFile(int argc, char *argv[])
     var[i]=0;
   for (int i=0;i<size;i++)
 	mattest >> data[i];
+  cout << "Your Matrix is as follows: " <<endl;
   displayMat();
 
   mattest.close();
@@ -154,6 +159,12 @@ int main(int argc, char *argv[])
 {
   //Opens input file and stores the matrix
   inputFile(argc, argv);
+  do
+  {
+    cout <<"Do you want to show the process? (0 = Yes, 1 = No) : ";
+    cin >>choice;
+  }
+  while (choice >1 || choice <0);
   for (int i=0; i<row-1; i++)
   {
     setPivot(i);
