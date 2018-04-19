@@ -6,7 +6,7 @@ using namespace std;
 
 double *data;
 double *var;
-int row, col, size, bcol;
+int row, col, size;
 
 void displayMat()
 {
@@ -15,9 +15,9 @@ void displayMat()
   {
 	cout << data[k] << " ";
 	k++;
-	if (k % bcol == 0) //new line when k is bcol
+	if (k % col == 0) //new line when k is col
 	  cout << endl;
-  }  
+  }
   while (k<size);
   cout << endl;
 }
@@ -36,14 +36,14 @@ void solve()
   double t[row]; //numerator terms
   for(int i=1; i<=row; i++)
   {
-    t[0] = -data[(size-1)-((i-1)*bcol)];
-    d = data[(size-1)-((i-1)*bcol)-i];
+    t[0] = -data[(size-1)-((i-1)*col)];
+    d = data[(size-1)-((i-1)*col)-i];
     /*var was initialized to zero so that
     it's null when it's not needed in the terms*/
     /*var will be given a value for the
     next iterations where it's needed*/
     for(int j=1; j<row; j++)
-      t[j] = var[row-j]*data[(size-1)-((i-1)*bcol)-j];
+      t[j] = var[row-j]*data[(size-1)-((i-1)*col)-j];
     for(int j=0; j<row; j++)
       var[row-i] -= t[j];
     var[row-i] /= d;
@@ -54,13 +54,13 @@ void eliminate(int c)
 {
   cout << "Eliminating...\n";
   double f; //pivot factor
-  int pivot = c*bcol+c; //pivot's array address
+  int pivot = c*col+c; //pivot's array address
   for (int i=1; (i+c)<row; i++)
   {
-    f=-data[(c+i)*bcol+c]/data[pivot];
-    data[(i+c)*bcol+c]=0; //sets column pivot terms to zero
-    for (int j=1+c; j<bcol ;j++)
-      data[(c+i)*bcol+j]+=f*data[j+c*bcol]; //adjusts each term accordingly
+    f=-data[(c+i)*col+c]/data[pivot];
+    data[(i+c)*col+c]=0; //sets column pivot terms to zero
+    for (int j=1+c; j<col ;j++)
+      data[(c+i)*col+j]+=f*data[j+c*col]; //adjusts each term accordingly
   }
   displayMat();
   return;
@@ -70,12 +70,12 @@ void setPivot(int c)
 {
   cout << "Pivoting...\n";
   double dtmp; //data temp, stores data or terms
-  int dpivot = c*bcol+c; //stores pivot's array address
+  int dpivot = c*col+c; //stores pivot's array address
   int spivot; //safety pivot for when original pivot is zero
   int itmp = dpivot; //stores it again for comparison later
   double pivot = data[dpivot]; //pivot
   //searches for highest number by comparing to pivot
-  for(int i=dpivot, j=c; j<row; i+=bcol, j++)
+  for(int i=dpivot, j=c; j<row; i+=col, j++)
   {
     if (data[i] != 0) //stores nonzero pivot column
     {
@@ -102,7 +102,7 @@ void setPivot(int c)
     return;
   }
   else
-    for (int j=0, k = dpivot; k<bcol; j++, k++)
+    for (int j=0, k = dpivot; k<col; j++, k++)
     {
       dtmp = data[k]; //storing old pivot row
       data[k] = data[itmp+j]; //equate old pivot row to new pivot row
@@ -118,7 +118,7 @@ void inputFile(int argc, char *argv[])
 {
   ifstream mattest; //matrix test
   string filename;
-  
+
   if (argc < 2)
   {
     cout <<"Please enter the filename: ";
@@ -137,16 +137,15 @@ void inputFile(int argc, char *argv[])
 
   mattest >> row;
   mattest >> col;
-  bcol = col+1;
-  size = row*bcol;
+  size = row*col;
   data = new double[size];
   var = new double[row]; //solution array
   for(int i=0; i<row; i++) //initialized to zero, explained why in solve()
-    var[i]=0;  
+    var[i]=0;
   for (int i=0;i<size;i++)
 	mattest >> data[i];
   displayMat();
-  
+
   mattest.close();
   return;
 }
@@ -162,7 +161,7 @@ int main(int argc, char *argv[])
   }
   solve();
   output();
-  
+
   delete [] data;
   delete [] var;
   system("PAUSE");
