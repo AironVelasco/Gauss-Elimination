@@ -331,8 +331,38 @@ void inputFile(int argc, char *argv[])
   return;
 }
 
+
+void save()
+{
+  string filename;
+  cout <<"Please enter the filename: ";
+  cin >> filename;
+  filename.append(".txt");
+  ofstream saveFile (filename.c_str());
+  saveFile <<"For the given matrix: " <<endl;
+  int k = 0;
+  do
+  {
+    saveFile << data[k] << " \t";
+    k++;
+    if (k % col == 0) //new line when k is col
+    {
+      saveFile << endl;
+    }
+
+  }
+  while (k<size);
+  saveFile << endl;
+  saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
+  for(int i=0; i<row; i++)
+  {
+    saveFile << "x" << i << " = " << var[i] << endl;
+  }
+}
+
 int main(int argc, char *argv[])
 {
+  int choice2;
   //Opens input file and stores the matrix
   inputFile(argc, argv);
   do
@@ -348,9 +378,19 @@ int main(int argc, char *argv[])
   }
   solve();
   output();
-
+  do
+  {
+    cout <<"Do you want to save results? (0 = Yes, 1 = No) : ";
+    cin >>choice2;
+  }
+  while (choice >1 || choice <0);
+  if (choice2==0)
+  {
+    save();
+  }
   delete [] data;
   delete [] var;
+  cout << "Save Successful.";
   system("PAUSE");
   return EXIT_SUCCESS;
 }
