@@ -277,7 +277,7 @@ void removeRow(int rowNum)
 
 bool checkZeroRows(int colPos, int countCol)
 {
-  for(int i=colPos; i<size-col; i=i+col)
+  for(int i=colPos; i<size+1; i=i+col)
   {
     //cout << "i: " << i << endl;
     if (data[i] == 0 && countCol < col)
@@ -297,7 +297,8 @@ bool checkZeroRows(int colPos, int countCol)
       else
       {
         countCol = 0;
-        return false;
+        if (i % col != 0)
+          return false;
       }
     }
     else if (data[i-1] == 0 && countCol == col)
@@ -305,6 +306,10 @@ bool checkZeroRows(int colPos, int countCol)
       //cout << "reset" << endl;
       countCol = 0;
       return true;
+    }
+    else if (data[i] != 0 && i % col != 0)
+    {
+      return false;
     }
   }
   return false;
@@ -336,7 +341,7 @@ void inputFile(int argc, char *argv[])
   mattest >> row;
   mattest >> col;
   size = row*col;
-  data = new double[size];
+  data = new double[size+1];
   var = new double[row]; //solution array
   for(int i=0; i<row; i++) //initialized to zero, explained why in solve()
     var[i]=0;
@@ -362,8 +367,36 @@ void inputFile(int argc, char *argv[])
   return;
 }
 
+void save()
+{
+  string filename;
+  cout <<"Please enter the filename: ";
+  cin >> filename;
+  filename.append(".txt");
+  ofstream saveFile (filename.c_str());
+  saveFile <<"For the given matrix: " <<endl;
+  int k = 0;
+  do
+  {
+    saveFile << data[k] << " \t";
+    k++;
+    if (k % col == 0) //new line when k is col
+    {
+      saveFile << endl;
+    }
+
+  }
+  while (k<size);
+  saveFile << endl;
+  saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
+  for(int i=0; i<row; i++)
+  {
+    saveFile << "x" << i << " = " << var[i] << endl;
+  }
+}
 int main(int argc, char *argv[])
 {
+  int choice2;
   //Opens input file and stores the matrix
   inputFile(argc, argv);
   do
@@ -386,8 +419,20 @@ int main(int argc, char *argv[])
   solve();
   output();
 
+  do
+  {
+    cout <<"Do you want to save results? (0 = Yes, 1 = No) : ";
+    cin >>choice2;
+  }
+  while (choice >1 || choice <0);
+  if (choice2==0)
+  {
+    save();
+  }
+
   delete [] data;
   delete [] var;
+  cout << "Save Successful.";
   system("PAUSE");
   return EXIT_SUCCESS;
 }
