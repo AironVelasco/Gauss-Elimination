@@ -119,7 +119,7 @@ void setPivot(int c)
   return;
 }
 
-
+/*
 bool checkMultiples(int colPos, int rowPos, double factor)
 {
   int newFactor;
@@ -161,8 +161,8 @@ bool checkMultiples(int colPos, int rowPos, double factor)
             match = true;
             if (checkMultiples(colPos + 1, j+1, newFactor) == true)
             {
-              delRow = j/col + 1;
-              cout << "Delete Row: " << delRow << endl;
+              delRow = j/col;
+              cout << "Delete Row: " << delRow+1 << endl;
               return true;
             }
           }
@@ -203,8 +203,8 @@ bool checkMultiples(int colPos, int rowPos, double factor)
             match = true;
             if (checkMultiples(colPos + 1,j+1, newFactor) == true)
             {
-              delRow = j/col + 1;
-              cout << "Delete Row: " << delRow << endl;
+              delRow = j/col;
+              cout << "Delete Row: " << delRow+1 << endl;
               return true;
             }
           }
@@ -242,8 +242,8 @@ bool checkMultiples(int colPos, int rowPos, double factor)
           match = true;
           if (checkMultiples(colPos + 1,j+1, newFactor) == true)
           {
-            delRow = j/col + 1;
-            cout << "Delete Row: " << delRow << endl;
+            delRow = j/col;
+            cout << "Delete Row: " << delRow+1 << endl;
             return true;
           }
         }
@@ -265,12 +265,51 @@ bool checkMultiples(int colPos, int rowPos, double factor)
     return false;
   }
 }
-/*
-void removeMultiples(int colPos, double factor)
-{
-
-}
 */
+
+void removeRow(int rowNum)
+{
+  copy(data + rowNum*col+col, data + size, data + rowNum*col);
+  row--;
+  size = size - col;
+  displayMat();
+}
+
+bool checkZeroRows(int colPos, int countCol)
+{
+  for(int i=colPos; i<size-col; i=i+col)
+  {
+    //cout << "i: " << i << endl;
+    if (data[i] == 0 && countCol < col)
+    {
+      countCol++;
+      //cout << " data[i]: " << data[i] << " colCount: " << countCol << endl;
+      if (checkZeroRows(i+1, countCol) == true)
+      {
+        if (i % col == 0)
+        {
+          delRow = i / col;
+          //cout << "cP: " << colPos << " i: " << i << endl;
+          //cout << "Delete Row: " << delRow +1 << endl;
+        }
+        return true;
+      }
+      else
+      {
+        countCol = 0;
+        return false;
+      }
+    }
+    else if (data[i-1] == 0 && countCol == col)
+    {
+      //cout << "reset" << endl;
+      countCol = 0;
+      return true;
+    }
+  }
+  return false;
+}
+
 
 
 void inputFile(int argc, char *argv[])
@@ -308,21 +347,13 @@ void inputFile(int argc, char *argv[])
   //Multiples
   // No Solution (Row < Col)
     //Check Zero Columns
-  prevComp = -1;
   delRow = -1;
-  if (checkMultiples(0, 0, 0) == true)
+  while (checkZeroRows(0,0) == true)
   {
-    cout << "true" << endl;
+    cout << "Removing a Row " << delRow+1 << " due to zero elements in Row" << endl;
+    removeRow(delRow);
+    delRow = -1;
   }
-  else
-  {
-    cout << "false" << endl;
-  }
-
-
-
-
-
 
   cout << "Your Matrix is as follows: " <<endl;
   displayMat();
@@ -331,38 +362,8 @@ void inputFile(int argc, char *argv[])
   return;
 }
 
-
-void save()
-{
-  string filename;
-  cout <<"Please enter the filename: ";
-  cin >> filename;
-  filename.append(".txt");
-  ofstream saveFile (filename.c_str());
-  saveFile <<"For the given matrix: " <<endl;
-  int k = 0;
-  do
-  {
-    saveFile << data[k] << " \t";
-    k++;
-    if (k % col == 0) //new line when k is col
-    {
-      saveFile << endl;
-    }
-
-  }
-  while (k<size);
-  saveFile << endl;
-  saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
-  for(int i=0; i<row; i++)
-  {
-    saveFile << "x" << i << " = " << var[i] << endl;
-  }
-}
-
 int main(int argc, char *argv[])
 {
-  int choice2;
   //Opens input file and stores the matrix
   inputFile(argc, argv);
   do
@@ -375,22 +376,18 @@ int main(int argc, char *argv[])
   {
     setPivot(i);
     eliminate(i);
+    while (checkZeroRows(0,0) == true)
+    {
+      cout << "Removing Row " << delRow+1 << " due to zero elements in Row" << endl;
+      removeRow(delRow);
+      delRow = -1;
+    }
   }
   solve();
   output();
-  do
-  {
-    cout <<"Do you want to save results? (0 = Yes, 1 = No) : ";
-    cin >>choice2;
-  }
-  while (choice >1 || choice <0);
-  if (choice2==0)
-  {
-    save();
-  }
+
   delete [] data;
   delete [] var;
-  cout << "Save Successful.";
   system("PAUSE");
   return EXIT_SUCCESS;
 }
