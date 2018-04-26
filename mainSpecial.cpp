@@ -70,7 +70,7 @@ bool noSol(int colPos, int countCol)
 
 bool multSol()
 {
-  if (row != col)
+  if (row  != col-1)
     return true;
   return false;
 }
