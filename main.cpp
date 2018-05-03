@@ -8,7 +8,7 @@ using namespace std;
 double *data;
 double *ogData;
 double *var;
-bool inpFile=false;
+bool inpFile;
 int prevComp, delRow;
 int row, col, size, ogSize;
 int choice=0;
@@ -219,10 +219,9 @@ void inputFile(int argc, char *argv[])
 {
   ifstream mattest; //matrix test
   string filename;
-
+  inpFile = false;
   if (argc < 2)
   {
-    inpFile = true;
     cout <<"Please enter the filename: ";
     cin >> filename;
     mattest.open(filename.c_str());
@@ -244,16 +243,16 @@ void inputFile(int argc, char *argv[])
   mattest >> col;
   size = row*col;
   data = new double[size+1];
+  ogSize = size;
+  ogData = new double[ogSize+1];
   var = new double[row]; //solution array
   for(int i=0; i<row; i++) //initialized to zero, explained why in solve()
     var[i]=0;
   for (int i=0;i<size;i++)
-	mattest >> data[i];
-
-  ogSize = size;
-  ogData = new double[ogSize+1];
-  ogData = data;
-
+  {
+   mattest >> data[i];
+   ogData[i] = data[i];
+  }
   delRow = -1;
   while (checkZeroRows(0,0) == true)
   {
@@ -269,18 +268,50 @@ void inputFile(int argc, char *argv[])
   return;
 }
 
+double Round_off(double base, double sigfig)
+{
+    int h;
+    double l, a, b, d, e, i, j, m, f;
+    b = base;
+    // Counting the no. of digits to the left of decimal point
+    // in the given no.
+    for (i = 0; b >= 1; ++i)
+        b = b / 10;
+
+    d = sigfig - i;
+    b = base;
+    b = b * pow(10, d);
+    e = b + 0.5;
+    if ((float)e == (float)ceil(b)) {
+        f = (ceil(b));
+        h = f - 2;
+        if (h % 2 != 0) {
+            e = e - 1;
+        }
+    }
+    j = floor(e);
+    m = pow(10, d);
+    j = j / m;
+    return j;
+}
+
+
 void save()
 {
+  int sf;
   string filename;
   cout <<"Please enter the filename: ";
   cin >> filename;
+  cout <<"How many significant figures should it include?: ";
+  cin >> sf;
   filename.append(".txt");
   ofstream saveFile (filename.c_str());
   saveFile <<"For the given matrix: " <<endl;
   int k = 0;
   do
   {
-    saveFile << data[k] << " \t";
+    cout << ogData[k];
+    saveFile << ogData[k] << " \t";
     k++;
     if (k % col == 0) //new line when k is col
     {
@@ -288,12 +319,12 @@ void save()
     }
 
   }
-  while (k<size);
+  while (k<ogSize);
   saveFile << endl;
   saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
   for(int i=0; i<row; i++)
   {
-    saveFile << "x" << i << " = " << var[i] << endl;
+    saveFile << "x" << i << " = " << Round_off(var[i],sf) << endl;
   }
 }
 
