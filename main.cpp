@@ -6,9 +6,11 @@
 using namespace std;
 
 double *data;
+double *ogData;
 double *var;
+bool inpFile=false;
 int prevComp, delRow;
-int row, col, size;
+int row, col, size, ogSize;
 int choice=0;
 
 void displayMat()
@@ -26,6 +28,53 @@ void displayMat()
     while (k<size);
     cout << endl;
   }
+}
+
+bool noSol(int colPos, int countCol)
+{
+  for(int i=colPos; i<size+1; i=i+col)
+  {
+    if (data[i] == 0 && countCol < col)
+    {
+      countCol++;
+      if (noSol(i+1, countCol) == true)
+      {
+        return true;
+      }
+      else
+      {
+        countCol = 0;
+        if (i % col != 0)
+        {
+          return false;
+        }
+      }
+    }
+    else if (data[i-1] == 0 && countCol == col)
+    {
+      countCol = 0;
+      return true;
+    }
+    else if (data[i] != 0 && i % col != 0)
+    {
+      if (countCol+1 == col)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return false;
+}
+
+bool multSol()
+{
+  if (row  != col-1)
+    return true;
+  return false;
 }
 
 void output()
@@ -119,154 +168,6 @@ void setPivot(int c)
   return;
 }
 
-/*
-bool checkMultiples(int colPos, int rowPos, double factor)
-{
-  int newFactor;
-  bool match = false;
-  for(int i=colPos; i<size-col; i=i+col)
-  {
-    if (prevComp == -1)
-      rowPos = i + col;
-    for (int j=rowPos; j<size; j=j+col)
-    {
-      cout << i << " " << j << " " << rowPos << endl;
-      if (data[i] > data[j])
-      {
-        if (fmod(data[i], data[j]) == 0 && (prevComp <= 0))
-        {
-          newFactor = data[i] / data[j];
-          if(prevComp != -1 && newFactor == factor)
-          {
-            cout << "x: " << colPos+1 << " y0: " << i/col + 1 << " y1: " << j/col +1 << " Data[i]: " << data[i] << " Data[j]: " << data[j] << " factor: " << newFactor << endl;
-            match = true;
-            if (colPos < col-1)
-            {
-              if (checkMultiples(colPos + 1, j+1, newFactor) == true)
-              {
-                return true;
-              }
-              else
-              {
-                return false;
-              }
-            }
-            else
-              return true;
-          }
-          else if (prevComp == -1)
-          {
-            cout << "x: " << colPos+1 << " y0: " << i/col + 1 << " y1: " << j/col +1 << " Data[i]: " << data[i] << " Data[j]: " << data[j] << " factor: " << newFactor << endl;
-            prevComp = 0;
-            match = true;
-            if (checkMultiples(colPos + 1, j+1, newFactor) == true)
-            {
-              delRow = j/col;
-              cout << "Delete Row: " << delRow+1 << endl;
-              return true;
-            }
-          }
-          else if (factor != newFactor)
-          {
-            return false;
-          }
-        }
-      }
-      else if (data[i] < data[j] && match == false && (prevComp < 0 || prevComp == 1))
-      {
-        if (fmod(data[j], data[i]) == 0)
-        {
-          newFactor = data[j] / data[i];
-          if(prevComp != -1 && newFactor == factor)
-          {
-            cout << "x: " << colPos+1 << " y0: " << i/col + 1 << " y1: " << j/col +1 << " Data[i]: " << data[i] << " Data[j]: " << data[j] << " factor: " << newFactor << endl;
-            match = true;
-            prevComp = 1;
-            if (colPos < col-1)
-            {
-              if (checkMultiples(colPos + 1, j+1, newFactor) == true)
-              {
-                return true;
-              }
-              else
-              {
-                return false;
-              }
-            }
-            else
-              return true;
-          }
-          else if (prevComp == -1)
-          {
-            cout << "x: " << colPos+1 << " y0: " << i/col + 1 << " y1: " << j/col +1 << " Data[i]: " << data[i] << " Data[j]: " << data[j] << " factor: " << newFactor << endl;
-            prevComp = 1;
-            match = true;
-            if (checkMultiples(colPos + 1,j+1, newFactor) == true)
-            {
-              delRow = j/col;
-              cout << "Delete Row: " << delRow+1 << endl;
-              return true;
-            }
-          }
-          else if (factor != newFactor)
-          {
-            return false;
-          }
-        }
-      }
-      else if (data[i] == data[j] && match == false && (prevComp < 0 || prevComp == 2))
-      {
-        newFactor = 1;
-        if(prevComp != -1 && newFactor == factor)
-        {
-          cout << "x: " << colPos+1 << " y0: " << i/col + 1 << " y1: " << j/col +1 << " Data[i]: " << data[i] << " Data[j]: " << data[j] << " factor: " << newFactor << endl;
-          match = true;
-          prevComp = 2;
-          if (colPos < col-1)
-          {
-            if (checkMultiples(colPos + 1,j+1, newFactor) == true)
-            {
-              return true;
-            }
-            else
-            {
-              return false;
-            }
-          }
-          else
-            return true;
-        }
-        else if (prevComp == -1)
-        {
-          prevComp = 2;
-          match = true;
-          if (checkMultiples(colPos + 1,j+1, newFactor) == true)
-          {
-            delRow = j/col;
-            cout << "Delete Row: " << delRow+1 << endl;
-            return true;
-          }
-        }
-        else if (factor != newFactor)
-        {
-          return false;
-        }
-      }
-    }
-  }
-  if (match == true)
-  {
-    cout << "true" << endl;
-    return true;
-  }
-  else
-  {
-    cout << "false" << endl;
-    return false;
-  }
-}
-*/
-
 void removeRow(int rowNum)
 {
   copy(data + rowNum*col+col, data + size, data + rowNum*col);
@@ -303,7 +204,6 @@ bool checkZeroRows(int colPos, int countCol)
     }
     else if (data[i-1] == 0 && countCol == col)
     {
-      //cout << "reset" << endl;
       countCol = 0;
       return true;
     }
@@ -315,8 +215,6 @@ bool checkZeroRows(int colPos, int countCol)
   return false;
 }
 
-
-
 void inputFile(int argc, char *argv[])
 {
   ifstream mattest; //matrix test
@@ -324,12 +222,16 @@ void inputFile(int argc, char *argv[])
 
   if (argc < 2)
   {
+    inpFile = true;
     cout <<"Please enter the filename: ";
     cin >> filename;
     mattest.open(filename.c_str());
   }
   else
+  {
+    inpFile = true;
     mattest.open(argv[1]);
+  }
 
   while (!mattest)
   {
@@ -348,10 +250,10 @@ void inputFile(int argc, char *argv[])
   for (int i=0;i<size;i++)
 	mattest >> data[i];
 
-	//Special Cases
-  //Multiples
-  // No Solution (Row < Col)
-    //Check Zero Columns
+  ogSize = size;
+  ogData = new double[ogSize+1];
+  ogData = data;
+
   delRow = -1;
   while (checkZeroRows(0,0) == true)
   {
@@ -394,17 +296,24 @@ void save()
     saveFile << "x" << i << " = " << var[i] << endl;
   }
 }
+
 int main(int argc, char *argv[])
 {
   int choice2;
   //Opens input file and stores the matrix
   inputFile(argc, argv);
-  do
+  if (inpFile == false)
   {
-    cout <<"Do you want to show the process? (0 = Yes, 1 = No) : ";
-    cin >>choice;
+    do
+    {
+      cout <<"Do you want to show the process? (0 = Yes, 1 = No) : ";
+      cin >>choice;
+    }
+    while (choice >1 || choice <0);
   }
-  while (choice >1 || choice <0);
+  else
+    choice = 1;
+
   for (int i=0; i<row-1; i++)
   {
     setPivot(i);
@@ -415,20 +324,30 @@ int main(int argc, char *argv[])
       removeRow(delRow);
       delRow = -1;
     }
+    if (noSol(0,0) == true)
+    {
+      cout << "No Solution." << endl;
+      return EXIT_SUCCESS;
+    }
+  }
+  if (multSol() == true)
+  {
+    cout << "Multiple Solution." << endl;
+    return EXIT_SUCCESS;
   }
   solve();
   output();
-
   do
   {
     cout <<"Do you want to save results? (0 = Yes, 1 = No) : ";
     cin >>choice2;
   }
-  while (choice >1 || choice <0);
+  while (choice2 >1 || choice2 <0);
   if (choice2==0)
   {
     save();
   }
+
 
   delete [] data;
   delete [] var;
