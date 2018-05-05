@@ -22,8 +22,9 @@ double sigfig(double a, int n)
 {
   int flag=1;
   a = dabs(a);
-  /*
+  
   double temp = a;
+  /*
   int itemp = a;
   double idtemp = itemp;
   
