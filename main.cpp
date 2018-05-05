@@ -31,12 +31,17 @@ void displayMat() //This program displays the matrix entered by user.
 }
 
 bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
-{ //ADD COMMENTS HERE
+{ 
+  //the function utilizes recursion to check the elements in each row
+  //the recursion is triggered when a zero element is found in the first column
+  //and also when the succeding element in the row is also a zero.
+  //The recursion ends when it has reached the final element in the row.
   for(int i=colPos; i<size+1; i=i+col)
   {
-    if (data[i] == 0 && countCol < col)
+    if (data[i] == 0 && countCol < col) // Checks if the element is zero
     {
       countCol++;
+      //calls the function again with the position of the next element in the row
       if (noSol(i+1, countCol) == true)
         return true;
       else
@@ -53,6 +58,9 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
     }
     else if (data[i] != 0 && i % col != 0)
     {
+      //if the last value in the row is a non-zero while the 
+      //other elements are zero, then the matrix has no solution 
+      //and the function would return true.
       if (countCol+1 == col)
         return true;
       else
@@ -197,6 +205,11 @@ void removeRow(int rowNum) // if a whole row contains 0,it is removed
 
 bool checkZeroRows(int colPos, int countCol)
 { //checks if the elements of a given row are all zeroes
+  //As with the noSol function, this function laso utilizes recursion 
+  //to check the elements in each row. The recursion is triggered 
+  //when a zero element is found in the first column and also when 
+  //the succeding element in the row is also a zero. 
+  //The recursion ends when it has reached the final element in the row.
   for(int i=colPos; i<size+1; i=i+col)
   {
     if (data[i] == 0 && countCol < col)
