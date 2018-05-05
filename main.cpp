@@ -1,3 +1,5 @@
+//CE 30 Project 3: Matrix Solver Using Gaussian Elimination Method
+//Julius Balgos, Sylvester Cunanan, Airon Velasco
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -22,8 +24,10 @@ void displayMat() //This program displays the matrix entered by user.
     {
       cout << data[elemno] << " \t";
       elemno++;
-      if (elemno % col == 0) //new line when k reaches the number "col"
+      if (elemno % col == 0) //new line after "col" # of elements
+      {
         cout << endl;
+      }
     }
     while (elemno < size);
     cout << endl;
@@ -33,17 +37,22 @@ void displayMat() //This program displays the matrix entered by user.
 bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
 { 
   //the function utilizes recursion to check the elements in each row
-  //the recursion is triggered when a zero element is found in the first column
+  /*the recursion is triggered when a zero element is found in the 
+  first column*/
   //and also when the succeding element in the row is also a zero.
-  //The recursion ends when it has reached the final element in the row.
+  /*The recursion ends when it has reached the final element in the 
+  row.*/
   for(int i=colPos; i<size+1; i=i+col)
   {
-    if (data[i] == 0 && countCol < col) // Checks if the element is zero
+    if (data[i] == 0 && countCol < col) // Checks if the element is 0.
     {
       countCol++;
-      //calls the function again with the position of the next element in the row
+      /*calls the function again with the position of the next 
+      element in the row*/
       if (noSol(i+1, countCol) == true)
+      {
         return true;
+      }
       else
       {
         countCol = 0;
@@ -73,22 +82,30 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
 bool multSol() //Checks if Matrix Has Multiple Sol'n
 { //This happens when the #of rows doesnt match the #of columns-1
   if (row  != col-1)
+  {
     return true;
+  }
   else
+  {
     return false;
+  }
 }
 
 void output() //Outputs the solution to the matrix
 {
   for(int i=0; i<row; i++)
+  {
     cout << "x" << i << " = " << var[i] << endl;
+  }
   return;
 }
 
 void solve() //Uses back substitution to get the answers to the matrix
 {
   if (choice == 0)
+  {
     cout << "Solving...\n";
+  }
   double d; //denominator
   double t[row]; //numerator terms
   for(int i=1; i<=row; i++) //goes thru each row starting with last
@@ -118,7 +135,9 @@ void eliminate(int c) //Performs The Gauss method of elimination
   /*c here tells which diagonal pivot we are located as the reference
   /* This function eliminates the elements under the pivot*/
   if (choice == 0)
+  {
     cout << "Eliminating...\n";
+  }
   double f; //pivot factor
   int pivot = c*col+c; //pivot's array address
   /*goes thru each row where c limits the number of iterations
@@ -128,8 +147,8 @@ void eliminate(int c) //Performs The Gauss method of elimination
     /*divides the negative of the data under pivot's column 
     by the pivot; this is the factor for making the pivot column zero
     where Af + B = 0 => f = -B/A*/
-    f=-data[(c+i)*col+c]/data[pivot];
-    data[(i+c)*col+c]=0; //sets pivot column to zero
+    f = -data[(c+i)*col+c]/data[pivot];
+    data[(i+c)*col+c] = 0; //sets pivot column to zero
     for (int j=1+c; j<col ;j++) //goes thru each col of i row
     {
       /*given the form Af + B = Anext, the row terms
@@ -146,7 +165,9 @@ void eliminate(int c) //Performs The Gauss method of elimination
 void setPivot(int c) //This function rearranges the pivot
 {
   if (choice == 0)
+  {
     cout << "Pivoting...\n";
+  }
   double dtmp; //data temp, stores data or terms
   int dpivot = c*col+c; //stores pivot's array address
   int spivot; //safety pivot for when original pivot is zero
@@ -175,7 +196,9 @@ void setPivot(int c) //This function rearranges the pivot
   if (dpivot == itmp)
   {
     if (choice == 0) //if the same, no pivot needed
+    {
       cout << "No Pivot Needed\n\n";
+    }
     return;
   }
   else
@@ -209,7 +232,7 @@ bool checkZeroRows(int colPos, int countCol)
   //to check the elements in each row. The recursion is triggered 
   //when a zero element is found in the first column and also when 
   //the succeding element in the row is also a zero. 
-  //The recursion ends when it has reached the final element in the row.
+  //Recursion ends when it has reached the final element in the row.
   for(int i=colPos; i<size+1; i=i+col)
   {
     if (data[i] == 0 && countCol < col)
@@ -227,7 +250,9 @@ bool checkZeroRows(int colPos, int countCol)
       {
         countCol = 0;
         if (i % col != 0)
+        {
           return false;
+        }
       }
     }
     else if (data[i-1] == 0 && countCol == col)
@@ -302,15 +327,21 @@ void inputFile(int argc, char *argv[]) //Loads file
 double dabs(double a) //absolute value function for a double
 {
   if (a < 0)
+  {
     return -a;
+  }
   else
+  {
     return a;
+  }
 }
 
 int pow10(double a, int n) //multiplies num by 10^n
 {
   for(int i=1; i<=n; i++)
+  {
     a *= 10;
+  }
   return a;
 }
 
@@ -339,15 +370,20 @@ double sigfig(double a, int n) //rounds number to specified amt of sf
   /*does Half Round Up Method. For example
   1.4->1, 1.5->2, 1.6->2, -1.4->-1, -1.5->-1, -1.6->-2*/
   if((b1%b2)>=5 && temp>=0)  
-      b2++;
+  {
+    b2++;
+  }
   else if ((b1%b2)>5 && temp<0)
-      b2++;
-
-  a=b2; //stores int to double to apply decimals
+  {
+    b2++;
+  }
+  
+  a = b2; //stores int to double to apply decimals
 
   for(int i=1; i<n; i++) //reverts back by n (sigfig) times
+  {
     a /= 10;
-
+  }
   //reverts further more from x.xxx form
   while(flaga>1)
   {
@@ -361,9 +397,13 @@ double sigfig(double a, int n) //rounds number to specified amt of sf
   };
 
   if (temp>=0) //returns with the original's sign
+  {
     return a;
+  }
   else
+  {
     return -a;
+  }
 }
 
 void save() //saves file
@@ -412,7 +452,9 @@ int main(int argc, char *argv[])
     while (choice >1 || choice <0);
   }
   else //as per the specs, if file specified is values don't show soln
+  {
     choice = 1;
+  }
 
   for (int i=0; i<row-1; i++)
   {
