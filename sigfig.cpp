@@ -20,41 +20,51 @@ int pow10(double a, int n)
 
 double sigfig(double a, int n)
 {
-  int flag=1;
+  int flaga = 1;
+  int flagb = 1;
+  int b1,b2;
+  double temp = a;
   a = dabs(a);
   
-  double temp = a;
-  /*
-  int itemp = a;
-  double idtemp = itemp;
-  
-  if (idtemp==temp)
-    while (a>1)
-      a/=10;
-  */
-  
-  while (a>1) //transform to form 0.xxx
+  //set to form x.xxx
+  while(a>1)
   {
-    a /= 10;
-    flag++;
+    a/=10;
+    flaga++;
   };
-  int a1 = pow10(a,n+1);
-  int a2 = pow10(a,n);
-  if ((a1%a2) >= 5)
+  while(a<1)
   {
-    if (temp >= 0)
-      a2++;
-    else 
-      a2--;
+    a*=10;
+    flagb++;
+  };
+  b1 = pow10(a,n);
+  b2 = pow10(a,n-1);
+  
+  if((b1%b2)>=5)
+  {
+    if (temp>=0)
+      b2++;
+    else
+      b2--;
   }
-  for(int i=1; i<=n; i++)
+  
+  a=b2;
+  
+  for(int i=1; i<n; i++)
     a /= 10;
-  while(flag>1)
+  
+  while(flaga>1)
   {
-    a *= 10;
-    flag--;
-  }
-  if (temp >= 0)
+    a*=10;
+    flaga--;
+  };
+  while(flagb>1)
+  {
+    a/=10;
+    flagb--;
+  };
+  
+  if (temp>=0)
     return a;
   else
     return -a;
@@ -62,8 +72,8 @@ double sigfig(double a, int n)
 
 int main(int argc, char *argv[])
 {
-    double a = 120.1234;
-    int n = 2;
+    double a = 515.55;
+    int n = 4;
     cout << a << endl;
     cout << "sigfig: " << n << endl;
     cout << sigfig(a,n) << endl;
