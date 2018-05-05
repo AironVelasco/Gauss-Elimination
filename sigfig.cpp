@@ -40,13 +40,10 @@ double sigfig(double a, int n)
   b1 = pow10(a,n);
   b2 = pow10(a,n-1);
   
-  if((b1%b2)>=5)
-  {
-    if (temp>=0)
+  if((b1%b2)>=5 && temp>=0)
       b2++;
-    else
-      b2--;
-  }
+  else if ((b1%b2)>5 && temp<0)
+      b2++;
   
   a=b2;
   
@@ -72,8 +69,8 @@ double sigfig(double a, int n)
 
 int main(int argc, char *argv[])
 {
-    double a = 515.55;
-    int n = 4;
+    double a = -0.000012655512;
+    int n = 2;
     cout << a << endl;
     cout << "sigfig: " << n << endl;
     cout << sigfig(a,n) << endl;
