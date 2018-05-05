@@ -13,25 +13,25 @@ int prevComp, delRow;
 int row, col, size, ogSize;
 int choice=0;
 
-void displayMat()
+void displayMat() //This program displays the matrix entered by user.
 {
   if (choice == 0)
   {
-    int k = 0;
+    int elemno = 0;
     do
     {
-    cout << data[k] << " \t";
-    k++;
-    if (k % col == 0) //new line when k is col
+    cout << data[elemno] << " \t";
+    elemno++;
+    if (elemno % col == 0) //new line when k reaches the number "col"
       cout << endl;
     }
-    while (k<size);
+    while (elemno < size);
     cout << endl;
   }
 }
 
-bool noSol(int colPos, int countCol)
-{
+bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
+{ //ADD COMMENTS HERE
   for(int i=colPos; i<size+1; i=i+col)
   {
     if (data[i] == 0 && countCol < col)
@@ -70,21 +70,26 @@ bool noSol(int colPos, int countCol)
   return false;
 }
 
-bool multSol()
-{
+bool multSol() //Checks if Matrix Has Multiple Sol'n
+{ //This happens when the #of rows doesnt match the #of columns-1
   if (row  != col-1)
+  {
     return true;
-  return false;
+  }
+  else
+  {
+    return false;
+  }
 }
 
-void output()
+void output() //Outputs the solution to the matrix
 {
   for(int i=0; i<row; i++)
     cout << "x" << i << " = " << var[i] << endl;
   return;
 }
 
-void solve()
+void solve() //Uses back substitution to get the answers to the matrix
 {
   cout << "Solving...\n";
   double d; //denominator
@@ -98,31 +103,42 @@ void solve()
     /*var will be given a value for the
     next iterations where it's needed*/
     for(int j=1; j<row; j++)
+    {
       t[j] = var[row-j]*data[(size-1)-((i-1)*col)-j];
+    }
     for(int j=0; j<row; j++)
+    {
       var[row-i] -= t[j];
+    }
     var[row-i] /= d;
   }
 }
 
-void eliminate(int c)
+void eliminate(int c) //Performs The Gauss method of elimination
 {
+  /* This function eliminates the elements under the pivot*/
   if (choice == 0)
+  {
     cout << "Eliminating...\n";
+  }
   double f; //pivot factor
   int pivot = c*col+c; //pivot's array address
   for (int i=1; (i+c)<row; i++)
   {
     f=-data[(c+i)*col+c]/data[pivot];
-    data[(i+c)*col+c]=0; //sets column pivot terms to zero
+    data[(i+c)*col+c]=0;
+    //sets terms in the same column as the pivot to zero
     for (int j=1+c; j<col ;j++)
-      data[(c+i)*col+j]+=f*data[j+c*col]; //adjusts each term accordingly
+    {
+      data[(c+i)*col+j]+=f*data[j+c*col];
+      //adjusts each term accordingly by subtracting to the data
+    }
   }
-  displayMat();
+  displayMat(); //Shows the user the adjusted matrix
   return;
 }
 
-void setPivot(int c)
+void setPivot(int c) //This function rearranges the pivot
 {
   if (choice == 0)
     cout << "Pivoting...\n";
@@ -154,7 +170,10 @@ void setPivot(int c)
   if (dpivot == itmp)
   {
     if (choice == 0)
+    {
       cout << "No Pivot Needed\n\n";
+    }
+
     return;
   }
   else
@@ -168,30 +187,27 @@ void setPivot(int c)
   return;
 }
 
-void removeRow(int rowNum)
+void removeRow(int rowNum) // if a whole row contains 0,it is removed
 {
+  //data from the next columns are moved
   copy(data + rowNum*col+col, data + size, data + rowNum*col);
-  row--;
+  row--;  //the size changes as a result
   size = size - col;
   displayMat();
 }
 
 bool checkZeroRows(int colPos, int countCol)
-{
+{ //checks if the elements of a given row are all zeroes
   for(int i=colPos; i<size+1; i=i+col)
   {
-    //cout << "i: " << i << endl;
     if (data[i] == 0 && countCol < col)
     {
       countCol++;
-      //cout << " data[i]: " << data[i] << " colCount: " << countCol << endl;
       if (checkZeroRows(i+1, countCol) == true)
       {
         if (i % col == 0)
         {
           delRow = i / col;
-          //cout << "cP: " << colPos << " i: " << i << endl;
-          //cout << "Delete Row: " << delRow +1 << endl;
         }
         return true;
       }
@@ -215,9 +231,9 @@ bool checkZeroRows(int colPos, int countCol)
   return false;
 }
 
-void inputFile(int argc, char *argv[])
+void inputFile(int argc, char *argv[]) //Loads file
 {
-  ifstream mattest; //matrix test
+  ifstream mattest; //matrix test filename
   string filename;
   inpFile = false;
   if (argc < 2)
@@ -246,17 +262,20 @@ void inputFile(int argc, char *argv[])
   ogSize = size;
   ogData = new double[ogSize+1];
   var = new double[row]; //solution array
-  for(int i=0; i<row; i++) //initialized to zero, explained why in solve()
+  for(int i=0; i<row; i++)
+  {//initialized to zero, explained why in solve()
     var[i]=0;
+  }
   for (int i=0;i<size;i++)
   {
    mattest >> data[i];
-   ogData[i] = data[i];
+   ogData[i] = data[i]; //makes a duplicate for save file
   }
   delRow = -1;
   while (checkZeroRows(0,0) == true)
   {
-    cout << "Removing a Row " << delRow+1 << " due to zero elements in Row" << endl;
+    cout << "Removing a Row " << delRow+1;
+    cout << " due to zero elements in Row" << endl;
     removeRow(delRow);
     delRow = -1;
   }
@@ -268,35 +287,74 @@ void inputFile(int argc, char *argv[])
   return;
 }
 
-double Round_off(double base, double sigfig)
+double dabs(double a) //absolute value function for a double
 {
-    int h;
-    double l, a, b, d, e, i, j, m, f;
-    b = base;
-    // Counting the no. of digits to the left of decimal point
-    // in the given no.
-    for (i = 0; b >= 1; ++i)
-        b = b / 10;
-
-    d = sigfig - i;
-    b = base;
-    b = b * pow(10, d);
-    e = b + 0.5;
-    if ((float)e == (float)ceil(b)) {
-        f = (ceil(b));
-        h = f - 2;
-        if (h % 2 != 0) {
-            e = e - 1;
-        }
-    }
-    j = floor(e);
-    m = pow(10, d);
-    j = j / m;
-    return j;
+  if (a < 0)
+    return -a;
+  else
+    return a;
 }
 
+int pow10(double a, int n) //multiplies num by 10^n
+{
+  for(int i=1; i<=n; i++)
+    a *= 10;
+  return a;
+}
 
-void save()
+double sigfig(double a, int n) //rounds number to specified amt of sf
+{
+  int flaga = 1;
+  int flagb = 1;
+  int b1,b2;
+  double temp = a;
+  a = dabs(a);
+
+  //set to form x.xxx
+  while(a>1) //counts # of digits before the decimal point
+  {
+    a/=10;
+    flaga++;
+  };
+  while(a<1) //counts the # of digits after the decimal point
+  {
+    a*=10;
+    flagb++;
+  };
+  b1 = pow10(a,n);
+  b2 = pow10(a,n-1);
+
+  if((b1%b2)>=5)
+  {
+    if (temp>=0)
+      b2++;
+    else
+      b2--;
+  }
+
+  a=b2;
+
+  for(int i=1; i<n; i++)
+    a /= 10;
+
+  while(flaga>1)
+  {
+    a*=10;
+    flaga--;
+  };
+  while(flagb>1)
+  {
+    a/=10;
+    flagb--;
+  };
+
+  if (temp>=0)
+    return a;
+  else
+    return -a;
+}
+
+void save() //saves file
 {
   int sf;
   string filename;
@@ -309,11 +367,10 @@ void save()
   saveFile <<"For the given matrix: " <<endl;
   int k = 0;
   do
-  {
-    cout << ogData[k];
+  { //original matrix entered by user
     saveFile << ogData[k] << " \t";
     k++;
-    if (k % col == 0) //new line when k is col
+    if (k % col == 0)
     {
       saveFile << endl;
     }
@@ -323,8 +380,8 @@ void save()
   saveFile << endl;
   saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
   for(int i=0; i<row; i++)
-  {
-    saveFile << "x" << i << " = " << Round_off(var[i],sf) << endl;
+  { //solution to each variable in the matrix
+    saveFile << "x" << i << " = " << sigfig(var[i],sf) << endl;
   }
 }
 
@@ -342,7 +399,7 @@ int main(int argc, char *argv[])
     }
     while (choice >1 || choice <0);
   }
-  else
+  else //as per the specs, if file specified is values don't show soln
     choice = 1;
 
   for (int i=0; i<row-1; i++)
@@ -351,7 +408,8 @@ int main(int argc, char *argv[])
     eliminate(i);
     while (checkZeroRows(0,0) == true)
     {
-      cout << "Removing Row " << delRow+1 << " due to zero elements in Row" << endl;
+      cout << "Removing Row ";
+      cout << delRow+1 << " due to zero elements in Row" << endl;
       removeRow(delRow);
       delRow = -1;
     }
@@ -379,10 +437,10 @@ int main(int argc, char *argv[])
     save();
   }
 
-
+  //frees up space
   delete [] data;
   delete [] var;
-  cout << "Save Successful.";
+  cout << "Save Successful." <<endl;
   system("PAUSE");
   return EXIT_SUCCESS;
 }
