@@ -14,6 +14,7 @@ bool inpFile;
 int prevComp, delRow;
 int row, col, size, ogSize;
 int choice=0;
+int solflag=0;
 
 void displayMat() //This program displays the matrix entered by user.
 {
@@ -57,9 +58,7 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
       {
         countCol = 0;
         if (i % col != 0)
-        {
           return false;
-        }
       }
     }
     else if (data[i-1] == 0 && countCol == col)
@@ -73,13 +72,9 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
       //other elements are zero, then the matrix has no solution 
       //and the function would return true.
       if (countCol+1 == col)
-      {
         return true;
-      }
       else
-      {
         return false;
-      }
     }
   }
   return false;
@@ -131,9 +126,7 @@ void solve() //Uses back substitution to get the answers to the matrix
       t[j] = var[row-j]*data[(size-1)-((i-1)*col)-j];
     }
     for(int j=0; j<row; j++)
-    {
       var[row-i] -= t[j]; //subtracts each terms
-    }
     var[row-i] /= d; //divides by the var's coefficient
   }
 }
@@ -236,7 +229,7 @@ void removeRow(int rowNum) // if a whole row contains 0,it is removed
 
 bool checkZeroRows(int colPos, int countCol)
 { //checks if the elements of a given row are all zeroes
-  //As with the noSol function, this function also utilizes recursion 
+  //As with the noSol function, this function laso utilizes recursion 
   //to check the elements in each row. The recursion is triggered 
   //when a zero element is found in the first column and also when 
   //the succeding element in the row is also a zero. 
@@ -420,8 +413,11 @@ void save() //saves file
   string filename;
   cout <<"Please enter the filename: ";
   cin >> filename;
-  cout <<"How many significant figures should it include?: ";
-  cin >> sf;
+  if (solflag ==0)
+  {
+    cout <<"How many significant figures should it include?: ";
+    cin >> sf;
+  }
   filename.append(".txt");
   ofstream saveFile (filename.c_str());
   saveFile <<"For the given matrix: " <<endl;
@@ -434,13 +430,27 @@ void save() //saves file
     {
       saveFile << endl;
     }
+
   }
   while (k<ogSize);
   saveFile << endl;
-  saveFile << "The Solution of Such Matrix is as Follows:" <<endl;
-  for(int i=0; i<row; i++)
-  { //solution to each variable in the matrix
-    saveFile << "x" << i << " = " << sigfig(var[i],sf) << endl;
+  if (solflag==0)
+  {
+    saveFile << "The solution to the matrix is as follows:" <<endl;
+    for(int i=0; i<row; i++)
+    { //solution to each variable in the matrix
+      saveFile << "x" << i << " = " << sigfig(var[i],sf) << endl;
+    }
+    saveFile << "Solutions are saved in ";
+    saveFile << sf <<" significant figures."<< endl;
+  }
+  else if (solflag==1)
+  {
+    saveFile << "There is no solution to this matrix." <<endl;
+  }
+  else if (solflag==2)
+  {
+    saveFile << "There are multiple solution to this matrix." <<endl;
   }
 }
 
@@ -476,17 +486,20 @@ int main(int argc, char *argv[])
     }
     if (noSol(0,0) == true)
     {
-      cout << "No Solution." << endl;
-      return EXIT_SUCCESS;
+      cout << "No Solution can be found." << endl;
+      solflag=1;
     }
   }
   if (multSol() == true)
   {
-    cout << "Multiple Solution." << endl;
-    return EXIT_SUCCESS;
+    cout << "Multiple Solutions found." << endl;
+    solflag=2;
   }
-  solve();
-  output();
+  if (solflag == 0)
+  {
+    solve();
+    output();
+  }
   do
   {
     cout <<"Do you want to save results? (0 = Yes, 1 = No) : ";
@@ -496,12 +509,12 @@ int main(int argc, char *argv[])
   if (choice2==0)
   {
     save();
+    cout << "Save Successful." <<endl;
   }
 
   //frees up space
   delete [] data;
   delete [] var;
-  cout << "Save Successful." <<endl;
   system("PAUSE");
   return EXIT_SUCCESS;
 }
