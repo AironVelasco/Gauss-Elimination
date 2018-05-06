@@ -229,10 +229,10 @@ void removeRow(int rowNum) // if a whole row contains 0,it is removed
 
 bool checkZeroRows(int colPos, int countCol)
 { //checks if the elements of a given row are all zeroes
-  //As with the noSol function, this function laso utilizes recursion 
+  //As with the noSol function, this function also utilizes recursion 
   //to check the elements in each row. The recursion is triggered 
   //when a zero element is found in the first column and also when 
-  //the succeding element in the row is also a zero. 
+  //the succeeding element in the row is also a zero. 
   //Recursion ends when it has reached the final element in the row.
   for(int i=colPos; i<size+1; i=i+col)
   {
