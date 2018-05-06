@@ -57,7 +57,9 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
       {
         countCol = 0;
         if (i % col != 0)
+        {
           return false;
+        }
       }
     }
     else if (data[i-1] == 0 && countCol == col)
@@ -71,9 +73,13 @@ bool noSol(int colPos, int countCol) //Checks if Matrix has No Sol'n
       //other elements are zero, then the matrix has no solution 
       //and the function would return true.
       if (countCol+1 == col)
+      {
         return true;
+      }
       else
+      {
         return false;
+      }
     }
   }
   return false;
@@ -125,7 +131,9 @@ void solve() //Uses back substitution to get the answers to the matrix
       t[j] = var[row-j]*data[(size-1)-((i-1)*col)-j];
     }
     for(int j=0; j<row; j++)
+    {
       var[row-i] -= t[j]; //subtracts each terms
+    }
     var[row-i] /= d; //divides by the var's coefficient
   }
 }
